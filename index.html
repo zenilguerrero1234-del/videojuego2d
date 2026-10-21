@@ -195,7 +195,7 @@
                 <li class="mb-2">✨ <strong>25 Objetos Activos:</strong> Desplazamiento aleatorio en 4 direcciones (arriba, abajo, diagonal con rebote, circular).</li>
                 <li class="mb-2">🎯 <strong>Interacción Mouse:</strong> Haz clic para purificar entidades; reaparecen al instante manteniendo siempre 25 en canvas.</li>
                 <li class="mb-2">💥 <strong>Física de Colisiones:</strong> Rebotes elásticos entre objetos con animaciones de chispas.</li>
-                <li class="mb-2">🎵 <strong>Audio & Clima:</strong> Sintetizador FM integrado y relámpagos espectrales aleatorios.</li>
+                <li class="mb-2">🎵 <strong>Audio & Clima:</strong> Música ambiental espeluznante, efectos únicos por objeto y relámpagos.</li>
                 </ul>
             </div>
 
@@ -225,14 +225,15 @@
          * Asignatura: Graficación
          */
 
-        // ESTADOS DEL JUEGO: 'MENU', 'PLAYING', 'PAUSED'
         let gameState = 'MENU';
 
-        // SINTETIZADOR DE AUDIO MÍSTICO (Web Audio API)
+        // SINTETIZADOR DE AUDIO MÍSTICO AVANZADO (Web Audio API)
         class AudioEngine {
         constructor() {
             this.ctx = null;
             this.isMuted = true;
+            this.ambientNodes = [];
+            this.ambientInterval = null;
         }
 
         init() {
@@ -245,24 +246,123 @@
             }
         }
 
-        playPurifySound(pitchMultiplier = 1) {
+        // Canción de fondo espeluznante (Drone ambiental con acordes menores + campanadas)
+        startSpookyMusic() {
+            if (!this.ctx || this.ambientNodes.length > 0) return;
+
+            const osc1 = this.ctx.createOscillator();
+            const osc2 = this.ctx.createOscillator();
+            const filter = this.ctx.createBiquadFilter();
+            const gain = this.ctx.createGain();
+
+            // Acorde menor misterioso (A2 y D#4 tritone)
+            osc1.type = 'sawtooth';
+            osc1.frequency.setValueAtTime(110, this.ctx.currentTime); 
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(155.56, this.ctx.currentTime); 
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(350, this.ctx.currentTime);
+
+            gain.gain.setValueAtTime(0.04, this.ctx.currentTime); // Volumen sutil de fondo
+
+            osc1.connect(filter);
+            osc2.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc1.start();
+            osc2.start();
+            this.ambientNodes = [osc1, osc2, gain];
+
+            // Campanadas espectrales periódicas en escala menor
+            this.ambientInterval = setInterval(() => {
+            if (this.isMuted || !this.ctx || gameState !== 'PLAYING') return;
+            const chime = this.ctx.createOscillator();
+            const chimeGain = this.ctx.createGain();
+            chime.type = 'sine';
+            const notes = [440, 523.25, 659.25, 698.46, 880];
+            const freq = notes[Math.floor(Math.random() * notes.length)];
+            chime.frequency.setValueAtTime(freq, this.ctx.currentTime);
+            chimeGain.gain.setValueAtTime(0.06, this.ctx.currentTime);
+            chimeGain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1.5);
+            chime.connect(chimeGain);
+            chimeGain.connect(this.ctx.destination);
+            chime.start();
+            chime.stop(this.ctx.currentTime + 1.5);
+            }, 4000);
+        }
+
+        stopSpookyMusic() {
+            this.ambientNodes.forEach(node => {
+            try { node.stop ? node.stop() : node.disconnect(); } catch(e){}
+            });
+            this.ambientNodes = [];
+            if (this.ambientInterval) {
+            clearInterval(this.ambientInterval);
+            this.ambientInterval = null;
+            }
+        }
+
+        // Sonido único y diferente dependiendo del objeto (tipo) clickeado
+        playObjectSound(typeName, combo = 1) {
             if (this.isMuted || !this.ctx) return;
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
-            
-            osc.type = 'sine';
-            const baseFreq = 440 * pitchMultiplier;
-            osc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.5, this.ctx.currentTime + 0.15);
+            const now = this.ctx.currentTime;
 
-            gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.2);
+            switch(typeName) {
+            case 'skull': // 💀 Campana profunda de tumba
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(220 * combo, now);
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                break;
+            
+            case 'pumpkin': // 🎃 Golpe hueco de calabaza / madera
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150 * combo, now);
+                osc.frequency.linearRampToValueAtTime(75, now + 0.18);
+                gain.gain.setValueAtTime(0.35, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                break;
+
+            case 'ghost': // 👻 Susurro etéreo ascendente
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33 * combo, now);
+                osc.frequency.exponentialRampToValueAtTime(1174.66, now + 0.28);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+                break;
+
+            case 'bat': // 🦇 Chirrido agudo y rápido
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(880 * combo, now);
+                osc.frequency.linearRampToValueAtTime(1400, now + 0.12);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                break;
+
+            case 'candle': // 🕯️ Destello cálido / campanita cristalina
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(783.99 * combo, now);
+                osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.22);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                break;
+
+            default:
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440 * combo, now);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+            }
 
             osc.connect(gain);
             gain.connect(this.ctx.destination);
-
-            osc.start();
-            osc.stop(this.ctx.currentTime + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.35);
         }
 
         playThunderSound() {
@@ -520,11 +620,9 @@
             spirits.forEach(s => { s.update(); s.draw(); });
             handleCollisions();
         } else {
-            // En pausa o menú, se dibujan estáticos o en segundo plano
             spirits.forEach(s => { s.draw(); });
         }
 
-        // Partículas y textos flotantes
         particles.forEach((p, idx) => {
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
@@ -548,7 +646,6 @@
 
         drawSpotlight();
 
-        // Banner de Pausa
         if (gameState === 'PAUSED') {
             ctx.fillStyle = 'rgba(5, 2, 10, 0.75)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -593,7 +690,9 @@
 
             createSparks(s.x, s.y, s.type.color, 22);
             addFloatingText(`+${points} ${combo > 1 ? 'x' + combo : ''}`, s.x, s.y, s.type.color);
-            audio.playPurifySound(1 + combo * 0.12);
+            
+            // Reproducir sonido único según el objeto (💀, 🎃, 👻, 🦇, 🕯️)
+            audio.playObjectSound(s.type.name, combo);
 
             s.reset();
             break;
@@ -632,13 +731,12 @@
 
         resetGame();
         gameState = 'PLAYING';
-        
-        // Ocultar Menú de Bienvenida con transición
+        audio.startSpookyMusic(); // Iniciar canción de fondo espeluznante
+
         const overlay = document.getElementById('welcomeOverlay');
         overlay.style.opacity = '0';
         setTimeout(() => overlay.style.display = 'none', 400);
 
-        // Habilitar controles de juego
         document.getElementById('btnPause').removeAttribute('disabled');
         document.getElementById('btnRestart').removeAttribute('disabled');
         });
@@ -646,6 +744,7 @@
         document.getElementById('btnPause').addEventListener('click', () => {
         if (gameState === 'PLAYING') {
             gameState = 'PAUSED';
+            audio.stopSpookyMusic();
             document.getElementById('btnPause').style.display = 'none';
             document.getElementById('btnResume').style.display = 'inline-block';
             document.getElementById('btnResume').removeAttribute('disabled');
@@ -655,6 +754,7 @@
         document.getElementById('btnResume').addEventListener('click', () => {
         if (gameState === 'PAUSED') {
             gameState = 'PLAYING';
+            if (!audio.isMuted) audio.startSpookyMusic();
             document.getElementById('btnResume').style.display = 'none';
             document.getElementById('btnPause').style.display = 'inline-block';
         }
@@ -663,6 +763,10 @@
         document.getElementById('btnRestart').addEventListener('click', () => {
         resetGame();
         gameState = 'PLAYING';
+        if (!audio.isMuted) {
+            audio.stopSpookyMusic();
+            audio.startSpookyMusic();
+        }
         document.getElementById('btnResume').style.display = 'none';
         document.getElementById('btnPause').style.display = 'inline-block';
         });
@@ -672,6 +776,12 @@
         audio.isMuted = !audio.isMuted;
         document.getElementById('audioIcon').innerText = audio.isMuted ? '🔇' : '🔊';
         document.getElementById('audioText').innerText = audio.isMuted ? 'Audio Místico' : 'Audio Activado';
+        
+        if (audio.isMuted) {
+            audio.stopSpookyMusic();
+        } else if (gameState === 'PLAYING') {
+            audio.startSpookyMusic();
+        }
         });
 
         // Inicializar Motor
