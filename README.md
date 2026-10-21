@@ -1,8 +1,5 @@
 # 💀 Caza de Espíritus 2D - Videojuego
 
-[![HTML5 Canvas](https://img.shields.io/badge/Canvas-2D-orange?style=flat-square&logo=html5)](https://developer.mozilla.org/es/docs/Web/API/Canvas_API)
-[![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.3-purple?style=flat-square&logo=bootstrap)](https://getbootstrap.com)
-[![Graficación](https://img.shields.io/badge/Asignatura-Graficación-blue?style=flat-square)](https://itch.io)
 
 > **Desarrollador:** Eduardo Zenil Guerrero  
 > **Número de Control:** 25200365  
