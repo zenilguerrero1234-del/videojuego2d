@@ -76,8 +76,6 @@ El escenario también incluye efectos visuales y un cursor con apariencia de mir
 
 ##  5. Conclusión
 
-El desarrollo de este proyecto permite poner en práctica los conocimientos adquiridos en la materia de Graficación y comprender mejor cómo se crean los movimientos y las animaciones en un videojuego. Durante su elaboración se trabaja con Canvas y JavaScript para dibujar los personajes, controlar sus movimientos y detectar las interacciones con el mouse.
-
-También se aprende a organizar una página web con HTML y CSS, utilizar Bootstrap para mejorar la presentación y agregar sonidos y efectos visuales para hacer el juego más atractivo.
-
-Finalmente, el uso de Git y GitHub Pages permite guardar los cambios del proyecto y publicarlo para que pueda ser probado desde internet. En general, la práctica ayuda a reforzar los conocimientos de programación y a comprender cómo se pueden combinar diferentes herramientas para desarrollar un videojuego sencillo.
+El desarrollo de este juego me permitió poner en práctica los conocimientos adquiridos en la materia de Graficación y comprender mejor cómo se crean los movimientos y las animaciones en un videojuego. Durante su elaboración se trabajó con Canvas y JavaScript para dibujar los personajes, controlar sus movimientos y detectar las interacciones con el mouse.
+También aprendí a organizar una página web con HTML y CSS, utilizar Bootstrap para mejorar la presentación y agregar sonidos y efectos visuales para hacer el juego más atractivo.
+Finalmente, el uso de Git y GitHub Pages me permitió guardar los cambios del proyecto y publicarlo para que pueda ser probado desde internet. En general, la práctica ayuda a reforzar los conocimientos de programación y a comprender cómo se pueden combinar diferentes herramientas para desarrollar un videojuego sencillo.
