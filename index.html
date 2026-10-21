@@ -1,728 +1,689 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
+    <!DOCTYPE html>
+    <html lang="es" data-bs-theme="dark">
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caza de Espíritus - Día de Muertos & Halloween | Graficación</title>
-    <!-- Favicon temático SVG Data URI -->
+    <title>Caza de Espíritus 2D - Motor Canvas Pro | Graficación</title>
+    
+    <!-- Favicon SVG Temático -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
     
-    <!-- Bootstrap 5.3 CSS -->
+    <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome 6 Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Orbitron:wght@400;700;900&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-dark: #080112;
-            --card-bg: rgba(20, 8, 38, 0.85);
-            --orange-neon: #ff6600;
-            --purple-glow: #a822ff;
-            --cyan-glow: #00f0ff;
-            --green-glow: #39ff14;
+        --bg-dark: #0a0512;
+        --accent-purple: #9d4edd;
+        --accent-orange: #ff9e00;
+        --accent-cyan: #00f5d4;
+        --panel-bg: rgba(18, 10, 31, 0.90);
         }
 
         body {
-            background-color: var(--bg-dark);
-            color: #ffffff;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 15% 20%, rgba(168, 34, 255, 0.18) 0%, transparent 45%),
-                radial-gradient(circle at 85% 80%, rgba(255, 102, 0, 0.18) 0%, transparent 45%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        background: radial-gradient(circle at center, #1b0c33 0%, #05020a 100%);
+        color: #e2e8f0;
+        font-family: 'Quicksand', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+        user-select: none;
         }
 
-        /* Cursor / Puntero personalizado estilo mira espectral */
+        .font-spooky {
+        font-family: 'Creepster', cursive;
+        letter-spacing: 2px;
+        }
+
+        .font-hud {
+        font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Puntero Personalizado de Alta Visibilidad */
         .custom-cursor-area {
-            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><circle cx='20' cy='20' r='16' fill='none' stroke='%23ff6600' stroke-width='2' stroke-dasharray='4,2'/><circle cx='20' cy='20' r='6' fill='none' stroke='%2300f0ff' stroke-width='1.5'/><circle cx='20' cy='20' r='2' fill='%23ff0055'/><line x1='20' y1='0' x2='20' y2='40' stroke='%2300f0ff' stroke-width='1'/><line x1='0' y1='20' x2='40' y2='20' stroke='%2300f0ff' stroke-width='1'/></svg>") 20 20, crosshair;
+        cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><circle cx='20' cy='20' r='18' fill='none' stroke='%2300f5d4' stroke-width='2' stroke-dasharray='4 2'/><circle cx='20' cy='20' r='4' fill='%23ff9e00'/><line x1='20' y1='2' x2='20' y2='38' stroke='%2300f5d4' stroke-width='1.5'/><line x1='2' y1='20' x2='38' y2='20' stroke='%2300f5d4' stroke-width='1.5'/></svg>") 20 20, crosshair;
         }
 
-        .header-title {
-            text-shadow: 0 0 15px var(--orange-neon), 0 0 30px var(--purple-glow);
-            font-weight: 900;
-            letter-spacing: 2px;
+        /* Estilizado del Lienzo Canvas */
+        #gameCanvas {
+        background: #030107;
+        border: 3px solid var(--accent-purple);
+        border-radius: 16px;
+        box-shadow: 0 0 35px rgba(157, 78, 221, 0.35), inset 0 0 20px rgba(0, 0, 0, 0.8);
+        width: 100%;
+        height: 520px;
+        display: block;
         }
 
         .glass-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(168, 34, 255, 0.4);
-            box-shadow: 0 0 30px rgba(112, 0, 255, 0.25);
-            border-radius: 16px;
-            backdrop-filter: blur(12px);
+        background: var(--panel-bg);
+        backdrop-filter: blur(14px);
+        border: 1px solid rgba(157, 78, 221, 0.3);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
-        #gameCanvas {
-            background: #020008;
-            border-radius: 14px;
-            box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 102, 0, 0.35);
-            display: block;
-            width: 100%;
-            height: auto;
-            touch-action: none;
+        .stat-badge {
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 158, 0, 0.3);
+        border-radius: 10px;
+        padding: 6px 14px;
         }
 
-        .hud-badge {
-            background: rgba(8, 2, 20, 0.85);
-            border: 1px solid var(--cyan-glow);
-            box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
-            border-radius: 10px;
+        /* Menú de Bienvenida Overlay */
+        #welcomeOverlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(5, 2, 10, 0.92);
+        backdrop-filter: blur(8px);
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-radius: 16px;
+        transition: opacity 0.4s ease;
         }
 
-        .instruction-box {
-            background: rgba(12, 4, 28, 0.75);
-            border-left: 4px solid var(--orange-neon);
+        .btn-action {
+        font-weight: 700;
+        font-family: 'Orbitron', sans-serif;
+        transition: all 0.25s ease;
         }
 
-        .badge-spectral {
-            background: linear-gradient(45deg, var(--orange-neon), var(--purple-glow));
-            box-shadow: 0 0 10px var(--orange-neon);
+        .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 15px currentColor;
         }
 
         footer {
-            border-top: 1px solid rgba(255, 102, 0, 0.25);
-            background: rgba(5, 1, 15, 0.95);
+        margin-top: auto;
+        border-top: 1px solid rgba(157, 78, 221, 0.2);
+        background: rgba(5, 2, 10, 0.95);
         }
     </style>
-</head>
-<body class="custom-cursor-area">
+    </head>
+    <body class="custom-cursor-area">
 
-    <!-- HEADER SEMÁNTICO -->
-    <header class="py-3 px-4 border-bottom border-warning border-opacity-25 bg-black bg-opacity-60">
-        <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <span class="fs-1 animate-bounce">💀</span>
-                <div>
-                    <h1 class="h3 m-0 header-title text-warning">CAZA DE ESPÍRITUS 2D</h1>
-                    <div class="d-flex align-items-center gap-2 mt-1">
-                        <span class="badge badge-spectral text-white px-2 py-1">Día de Muertos & Halloween</span>
-                        <small class="text-info fw-semibold">Asignatura: Graficación</small>
-                    </div>
-                </div>
+    <!-- HEADER -->
+    <header class="py-3 mb-2 border-bottom border-purple">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+            <span class="fs-1">🎃</span>
+            <div>
+            <h1 class="h2 mb-0 font-spooky text-warning">Caza de Espíritus 2D</h1>
+            <small class="text-muted font-hud">Graficación &bull; TecNM Pachuca</small>
             </div>
-            
-            <div class="d-flex align-items-center gap-2">
-                <button id="btnAudio" class="btn btn-outline-warning btn-sm px-3 py-2 fw-bold d-flex align-items-center gap-2">
-                    <i class="fas fa-volume-mute" id="audioIcon"></i> 
-                    <span>Música/SFX: <span id="audioStatus" class="text-danger">OFF</span></span>
-                </button>
-            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+            <button id="btnAudio" class="btn btn-outline-info btn-sm rounded-pill px-3 font-hud">
+            <span id="audioIcon">🔇</span> <span id="audioText">Audio Místico</span>
+            </button>
+        </div>
         </div>
     </header>
 
-    <!-- MAIN (ÁREA DE JUEGO Y CONTROLES) -->
-    <main class="container my-4 flex-grow-1">
-        <div class="row g-4">
-
-            <!-- Panel Principal Canvas & HUD -->
-            <div class="col-lg-9">
-                <div class="glass-card p-3">
-                    
-                    <!-- HUD Superior con Estadísticas en Tiempo Real -->
-                    <div class="row g-2 mb-3 text-center">
-                        <div class="col-4 col-md-3">
-                            <div class="hud-badge p-2 text-warning">
-                                <small class="d-block text-secondary text-uppercase fw-bold" style="font-size:0.7rem;">Atrapados</small>
-                                <i class="fas fa-crosshairs text-info me-1"></i>
-                                <span id="scoreCount" class="fs-4 text-white fw-bold">0</span>
-                            </div>
-                        </div>
-                        <div class="col-4 col-md-3">
-                            <div class="hud-badge p-2 text-warning">
-                                <small class="d-block text-secondary text-uppercase fw-bold" style="font-size:0.7rem;">Racha Combo</small>
-                                <i class="fas fa-bolt text-warning me-1"></i>
-                                <span id="comboCount" class="fs-4 text-warning fw-bold">x1</span>
-                            </div>
-                        </div>
-                        <div class="col-4 col-md-3">
-                            <div class="hud-badge p-2 text-info">
-                                <small class="d-block text-secondary text-uppercase fw-bold" style="font-size:0.7rem;">Precisión</small>
-                                <i class="fas fa-bullseye text-success me-1"></i>
-                                <span id="accuracyCount" class="fs-4 text-white fw-bold">100%</span>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <div class="hud-badge p-2 text-light">
-                                <small class="d-block text-secondary text-uppercase fw-bold" style="font-size:0.7rem;">Evento Espectral</small>
-                                <i class="fas fa-moon text-purple me-1"></i>
-                                <span id="eventStatus" class="fw-bold text-info" style="font-size: 0.9rem;">Noche Serena</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Canvas del Juego -->
-                    <canvas id="gameCanvas" width="920" height="540" class="custom-cursor-area"></canvas>
+    <!-- MAIN CONTENT -->
+    <main class="container my-2 flex-grow-1">
+        <div class="row g-3">
+        
+        <!-- Lado Izquierdo: CANVAS + CONTROLES + HUD -->
+        <div class="col-lg-9">
+            <div class="glass-card p-3 mb-3 position-relative overflow-hidden">
+            
+            <!-- MENÚ DE BIENVENIDA MODAL (OVERLAY) -->
+            <div id="welcomeOverlay" class="text-center p-4">
+                <div class="mb-3">
+                <span class="display-1">💀🦇🕯️</span>
+                </div>
+                <h2 class="font-spooky text-warning display-5 mb-2">Caza de Espíritus 2D</h2>
+                <p class="text-light mb-4 max-w-lg mx-auto" style="max-width: 500px;">
+                Bienvenido al simulador interactivo de gráficos 2D. Purifica las 25 entidades místicas en movimiento, evita perder el combo y domina los rebotes vectoriales en el cementerio nocturno.
+                </p>
+                <button id="btnStartGame" class="btn btn-warning btn-lg px-5 py-3 rounded-pill btn-action fs-5 text-dark">
+                🚀 Iniciar Cacería
+                </button>
+                <div class="mt-4 text-muted font-hud small">
+                Desarrollado por: Eduardo Zenil Guerrero
                 </div>
             </div>
 
-            <!-- Panel Lateral de Instrucciones y Stats -->
-            <div class="col-lg-3">
-                <div class="glass-card p-3 h-100 d-flex flex-column justify-content-between">
-                    <div>
-                        <h2 class="h5 text-warning mb-3 border-bottom border-secondary pb-2 d-flex align-items-center gap-2">
-                            <i class="fas fa-book-open text-info"></i>Instrucciones
-                        </h2>
-                        
-                        <div class="instruction-box p-3 rounded mb-3">
-                            <ul class="list-unstyled m-0 d-flex flex-column gap-2 text-light style-list" style="font-size: 0.88rem;">
-                                <li><i class="fas fa-hand-pointer text-warning me-2"></i><strong>Objetivo:</strong> Haz clic sobre los espectros para atraparlos antes de que huyan.</li>
-                                <li><i class="fas fa-infinity text-info me-2"></i><strong>Permanencia:</strong> Siempre habrá exactamente <strong>25 objetos</strong> en el canvas.</li>
-                                <li><i class="fas fa-arrows-spin text-danger me-2"></i><strong>4 Movimientos:</strong> Ascenso, Descenso, Diagonal con rebote y Órbitas circulares.</li>
-                                <li><i class="fas fa-meteor text-warning me-2"></i><strong>Colisiones:</strong> Al chocar entre sí rebotan emitiendo destellos espectrales.</li>
-                                <li><i class="fas fa-fire text-success me-2"></i><strong>Combos:</strong> Captura espíritus seguidos rápidamente para multiplicar tus puntos.</li>
-                            </ul>
-                        </div>
-
-                        <!-- Leyenda de Entidades y Tipos -->
-                        <div class="p-2 border border-secondary border-opacity-50 rounded bg-black bg-opacity-40">
-                            <small class="text-info d-block mb-1 fw-bold font-monospace" style="font-size: 0.75rem;">ENTIDADES ACTIVAS EN CANVAS:</small>
-                            <div class="d-flex justify-content-around text-center py-1" style="font-size: 1.4rem;">
-                                <span title="Calamar/Calaca">💀</span>
-                                <span title="Calabaza 🎃">🎃</span>
-                                <span title="Fantasma 👻">👻</span>
-                                <span title="Murciélago 🦇">🦇</span>
-                                <span title="Vela 🕯️">🕯️</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cuadro de Información del Desarrollador -->
-                    <div class="mt-3 p-2 text-center rounded bg-dark bg-opacity-80 border border-warning border-opacity-25">
-                        <small class="text-secondary d-block font-monospace" style="font-size:0.7rem;">PROYECTO GRAFICACIÓN</small>
-                        <strong class="text-warning d-block" style="font-size:0.85rem;">Eduardo Zenil Guerrero</strong>
-                        <span class="badge bg-secondary mt-1" style="font-size:0.65rem;">API Canvas 2D + Full Stack JS</span>
-                    </div>
-
+            <!-- BARRA DE CONTROLES SUPERIOR DEL JUEGO -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div class="d-flex gap-2">
+                <button id="btnPause" class="btn btn-warning btn-sm btn-action text-dark" disabled>⏸️ Pausar</button>
+                <button id="btnResume" class="btn btn-success btn-sm btn-action" style="display:none;" disabled>▶️ Reanudar</button>
+                <button id="btnRestart" class="btn btn-outline-danger btn-sm btn-action" disabled>🔄 Reiniciar</button>
+                </div>
+                
+                <div class="d-flex gap-3">
+                <div class="stat-badge text-center">
+                    <span class="text-uppercase text-muted small d-block font-hud" style="font-size: 0.65rem;">Atrapados</span>
+                    <span id="scoreText" class="fs-5 fw-bold text-warning font-hud">0</span>
+                </div>
+                <div class="stat-badge text-center">
+                    <span class="text-uppercase text-muted small d-block font-hud" style="font-size: 0.65rem;">Combo</span>
+                    <span id="comboText" class="fs-5 fw-bold text-info font-hud">x1</span>
+                </div>
+                <div class="stat-badge text-center">
+                    <span class="text-uppercase text-muted small d-block font-hud" style="font-size: 0.65rem;">Precisión</span>
+                    <span id="accuracyText" class="fs-5 fw-bold text-success font-hud">100%</span>
+                </div>
                 </div>
             </div>
+
+            <!-- LIENZO CANVAS PRINCIPAL -->
+            <div class="position-relative">
+                <canvas id="gameCanvas" width="900" height="520"></canvas>
+            </div>
+
+            </div>
+        </div>
+
+        <!-- Lado Derecho: Instrucciones y Panel Técnico -->
+        <div class="col-lg-3">
+            <div class="glass-card p-3 h-100 d-flex flex-column justify-content-between">
+            <div>
+                <h5 class="font-spooky text-warning mb-3 fs-4">📖 Reglas de Negocio</h5>
+                <ul class="list-unstyled small text-light space-y-2">
+                <li class="mb-2">✨ <strong>25 Objetos Activos:</strong> Desplazamiento aleatorio en 4 direcciones (arriba, abajo, diagonal con rebote, circular).</li>
+                <li class="mb-2">🎯 <strong>Interacción Mouse:</strong> Haz clic para purificar entidades; reaparecen al instante manteniendo siempre 25 en canvas.</li>
+                <li class="mb-2">💥 <strong>Física de Colisiones:</strong> Rebotes elásticos entre objetos con animaciones de chispas.</li>
+                <li class="mb-2">🎵 <strong>Audio & Clima:</strong> Sintetizador FM integrado y relámpagos espectrales aleatorios.</li>
+                </ul>
+            </div>
+
+            <div class="p-2 border border-secondary rounded bg-dark bg-opacity-50 text-center mt-3">
+                <small class="text-info d-block fw-bold font-hud">GRAFICACIÓN</small>
+                <small class="text-muted" style="font-size: 0.7rem;">2DO SEGUIMIENTO</small>
+            </div>
+            </div>
+        </div>
 
         </div>
     </main>
 
-    <!-- FOOTER SEMÁNTICO CON CRÉDITOS -->
-    <footer class="py-3 mt-auto text-center">
+    <!-- FOOTER -->
+    <footer class="py-3 text-center text-muted small">
         <div class="container">
-            <p class="m-0 text-white-50 small">
-                Desarrollado con <i class="fas fa-heart text-danger"></i> para la asignatura de <strong>Graficación</strong>
-            </p>
-            <p class="m-0 fw-bold text-warning small mt-1">
-                Creador: <span class="text-info">Eduardo Zenil Guerrero</span> | Tecnologías: Canvas 2D API, Web Audio API, Bootstrap 5, JavaScript ES6+
-            </p>
+        <p class="mb-1 text-light">Desarrollado por <strong class="text-warning">Eduardo Zenil Guerrero</strong></p>
+        <p class="mb-0 text-secondary" style="font-size: 0.8rem;">Asignatura: <span class="text-info">Graficación</span> &bull; Num. Control: <strong class="text-light">25200365</strong></p>
         </div>
     </footer>
 
-    <!-- LÓGICA MODULAR Y MOTOR DEL JUEGO -->
+    <!-- SCRIPT DEL MOTOR DE JUEGO FULL STACK -->
     <script>
-        /* ==========================================================================
-           SISTEMA DE AUDIO POLIFÓNICO SINTETIZADO (Web Audio API)
-           Garantiza música y SFX sin fallos de links o assets externos
-           ========================================================================== */
+        /**
+         * MOTOR DE JUEGO CANVAS 2D - EDICIÓN PROFESIONAL FULL STACK
+         * Autor: Eduardo Zenil Guerrero
+         * Asignatura: Graficación
+         */
+
+        // ESTADOS DEL JUEGO: 'MENU', 'PLAYING', 'PAUSED'
+        let gameState = 'MENU';
+
+        // SINTETIZADOR DE AUDIO MÍSTICO (Web Audio API)
         class AudioEngine {
-            constructor() {
-                this.ctx = null;
-                this.isMuted = true;
-                this.bgOsc = null;
-                this.bgGain = null;
+        constructor() {
+            this.ctx = null;
+            this.isMuted = true;
+        }
+
+        init() {
+            if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
             }
-
-            init() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-            }
-
-            toggleAudio() {
-                this.init();
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-
-                this.isMuted = !this.isMuted;
-                if (!this.isMuted) {
-                    this.startAmbientMusic();
-                } else {
-                    this.stopAmbientMusic();
-                }
-                return !this.isMuted;
-            }
-
-            startAmbientMusic() {
-                if (this.bgOsc) return;
-                try {
-                    this.bgOsc = this.ctx.createOscillator();
-                    this.bgGain = this.ctx.createGain();
-                    
-                    this.bgOsc.type = 'sawtooth';
-                    this.bgOsc.frequency.setValueAtTime(65, this.ctx.currentTime); // Tono grave ambiente místico
-
-                    // LFO Tremolo
-                    const lfo = this.ctx.createOscillator();
-                    lfo.frequency.value = 0.4;
-                    const lfoGain = this.ctx.createGain();
-                    lfoGain.gain.value = 15;
-                    lfo.connect(lfoGain);
-                    lfoGain.connect(this.bgOsc.frequency);
-                    lfo.start();
-
-                    this.bgGain.gain.setValueAtTime(0.04, this.ctx.currentTime);
-                    this.bgOsc.connect(this.bgGain);
-                    this.bgGain.connect(this.ctx.destination);
-                    this.bgOsc.start();
-                } catch(e) { console.error(e); }
-            }
-
-            stopAmbientMusic() {
-                if (this.bgOsc) {
-                    this.bgOsc.stop();
-                    this.bgOsc.disconnect();
-                    this.bgOsc = null;
-                }
-            }
-
-            playCaptureSound(combo = 1) {
-                if (this.isMuted || !this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                const baseFreq = 400 + (combo * 80);
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(baseFreq * 2, this.ctx.currentTime + 0.15);
-
-                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.15);
-            }
-
-            playCollisionSound() {
-                if (this.isMuted || !this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(140, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.08);
-
-                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.08);
+            if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
             }
         }
 
-        const audioApp = new AudioEngine();
-        document.getElementById('btnAudio').addEventListener('click', () => {
-            const active = audioApp.toggleAudio();
-            document.getElementById('audioStatus').textContent = active ? 'ON' : 'OFF';
-            document.getElementById('audioStatus').className = active ? 'text-success' : 'text-danger';
-            document.getElementById('audioIcon').className = active ? 'fas fa-volume-up text-warning' : 'fas fa-volume-mute text-danger';
-        });
+        playPurifySound(pitchMultiplier = 1) {
+            if (this.isMuted || !this.ctx) return;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            
+            osc.type = 'sine';
+            const baseFreq = 440 * pitchMultiplier;
+            osc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.5, this.ctx.currentTime + 0.15);
 
-        /* ==========================================================================
-           GENERADOR DE SPRITES DENTRO DEL CANVAS (Texturas en Memoria)
-           ========================================================================== */
-        const EMOJI_TYPES = ['💀', '🎃', '👻', '🦇', '🕯️'];
-        const SPRITE_TEXTURES = [];
+            gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.2);
 
-        function initTextures() {
-            EMOJI_TYPES.forEach(emoji => {
-                const offscreen = document.createElement('canvas');
-                offscreen.width = 54;
-                offscreen.height = 54;
-                const oCtx = offscreen.getContext('2d');
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
 
-                oCtx.shadowColor = '#00f0ff';
-                oCtx.shadowBlur = 10;
-                oCtx.font = '38px serif';
-                oCtx.textAlign = 'center';
-                oCtx.textBaseline = 'middle';
-                oCtx.fillText(emoji, 27, 28);
-
-                SPRITE_TEXTURES.push(offscreen);
-            });
-        }
-        initTextures();
-
-        /* ==========================================================================
-           SISTEMA DE PARTÍCULAS & TEXTOS FLOTANTES (Efectos Espectrales)
-           ========================================================================== */
-        class Particle {
-            constructor(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.radius = Math.random() * 4 + 2;
-                this.color = color || '#ff6600';
-                this.vx = (Math.random() - 0.5) * 7;
-                this.vy = (Math.random() - 0.5) * 7;
-                this.alpha = 1;
-                this.decay = Math.random() * 0.03 + 0.02;
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.alpha -= this.decay;
-            }
-
-            draw(ctx) {
-                ctx.save();
-                ctx.globalAlpha = Math.max(0, this.alpha);
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.shadowColor = this.color;
-                ctx.shadowBlur = 8;
-                ctx.fill();
-                ctx.restore();
-            }
+            osc.start();
+            osc.stop(this.ctx.currentTime + 0.2);
         }
 
-        class FloatingText {
-            constructor(x, y, text, color) {
-                this.x = x;
-                this.y = y;
-                this.text = text;
-                this.color = color || '#ff6600';
-                this.alpha = 1;
-                this.vy = -1.8;
+        playThunderSound() {
+            if (this.isMuted || !this.ctx) return;
+            const bufferSize = this.ctx.sampleRate * 0.4;
+            const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
             }
 
-            update() {
-                this.y += this.vy;
-                this.alpha -= 0.025;
-            }
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = buffer;
 
-            draw(ctx) {
-                ctx.save();
-                ctx.globalAlpha = Math.max(0, this.alpha);
-                ctx.font = 'bold 18px "Segoe UI", sans-serif';
-                ctx.fillStyle = this.color;
-                ctx.shadowColor = '#000';
-                ctx.shadowBlur = 6;
-                ctx.fillText(this.text, this.x, this.y);
-                ctx.restore();
-            }
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(250, this.ctx.currentTime);
+
+            const gain = this.ctx.createGain();
+            gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            noise.start();
+        }
         }
 
-        /* ==========================================================================
-           CLASE ESPÍRITU 2D (Entidades con 4 Tipos de Movimiento)
-           ========================================================================== */
-        class Spirit {
-            constructor(cw, ch) {
-                this.cw = cw;
-                this.ch = ch;
-                this.radius = 23;
-                this.reset();
-            }
+        const audio = new AudioEngine();
 
-            reset() {
-                this.x = Math.random() * (this.cw - 80) + 40;
-                this.y = Math.random() * (this.ch - 80) + 40;
-                this.texture = SPRITE_TEXTURES[Math.floor(Math.random() * SPRITE_TEXTURES.length)];
-                
-                // 0: Arriba, 1: Abajo, 2: Diagonal, 3: Circular
-                this.movePattern = Math.floor(Math.random() * 4);
-                this.speed = Math.random() * 2.2 + 1.2;
-
-                // Parámetros trigonométricos para patrón circular (r = r + v, x=cx+r*cos, y=cy+r*sin)
-                this.angle = Math.random() * Math.PI * 2;
-                this.orbitRadius = Math.random() * 35 + 20;
-                this.centerX = this.x;
-                this.centerY = this.y;
-
-                const dir = Math.random() < 0.5 ? 1 : -1;
-                this.vx = (Math.random() * 1.5 + 0.8) * dir;
-                this.vy = (Math.random() * 1.5 + 0.8) * dir;
-            }
-
-            update() {
-                switch (this.movePattern) {
-                    case 0: // Arriba (Ascenso)
-                        this.y -= this.speed;
-                        this.x += Math.sin(this.y * 0.05) * 0.8; // Ligera fluctuación
-                        if (this.y < -30) {
-                            this.y = this.ch + 30;
-                            this.x = Math.random() * this.cw;
-                        }
-                        break;
-
-                    case 1: // Abajo (Caída)
-                        this.y += this.speed;
-                        this.x += Math.cos(this.y * 0.05) * 0.8;
-                        if (this.y > this.ch + 30) {
-                            this.y = -30;
-                            this.x = Math.random() * this.cw;
-                        }
-                        break;
-
-                    case 2: // Diagonal (Con rebote en bordes)
-                        this.x += this.vx * this.speed;
-                        this.y += this.vy * this.speed;
-
-                        if (this.x - this.radius < 0 || this.x + this.radius > this.cw) this.vx *= -1;
-                        if (this.y - this.radius < 0 || this.y + this.radius > this.ch) this.vy *= -1;
-                        break;
-
-                    case 3: // Circular (Órbita trigonométrica)
-                        this.angle += 0.04;
-                        this.centerX += this.vx * (this.speed * 0.4);
-                        this.centerY += this.vy * (this.speed * 0.4);
-
-                        this.x = this.centerX + Math.cos(this.angle) * this.orbitRadius;
-                        this.y = this.centerY + Math.sin(this.angle) * this.orbitRadius;
-
-                        if (this.centerX < 30 || this.centerX > this.cw - 30) this.vx *= -1;
-                        if (this.centerY < 30 || this.centerY > this.ch - 30) this.vy *= -1;
-                        break;
-                }
-            }
-
-            draw(ctx) {
-                ctx.drawImage(this.texture, this.x - 27, this.y - 27);
-            }
-        }
-
-        /* ==========================================================================
-           MOTOR Y CICLO PRINCIPAL DEL JUEGO
-           ========================================================================== */
+        // CANVAS SETUP
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Elementos HUD
-        const scoreElem = document.getElementById('scoreCount');
-        const comboElem = document.getElementById('comboCount');
-        const accuracyElem = document.getElementById('accuracyCount');
-        const eventElem = document.getElementById('eventStatus');
+        const MAX_OBJECTS = 25;
+        let spirits = [];
+        let particles = [];
+        let floatingTexts = [];
+        let rainDrops = [];
 
-        // Estado del juego
+        // MÉTRICAS
         let score = 0;
-        let combo = 1;
         let totalClicks = 0;
-        let successfulHits = 0;
-        let lastHitTime = Date.now();
-        const MAX_OBJECTS = 25; // Exigido exactamente 25 objetos
+        let hits = 0;
+        let combo = 0;
+        let lastHitTime = 0;
+        let mousePos = { x: -1000, y: -1000 };
+        let lightningOpacity = 0;
 
-        const spirits = [];
-        const particles = [];
-        const floatTexts = [];
+        const SPRITE_TYPES = [
+        { name: 'skull', emoji: '💀', color: '#e0aaff' },
+        { name: 'pumpkin', emoji: '🎃', color: '#ff9e00' },
+        { name: 'ghost', emoji: '👻', color: '#00f5d4' },
+        { name: 'bat', emoji: '🦇', color: '#7b2cbf' },
+        { name: 'candle', emoji: '🕯️', color: '#ffd166' }
+        ];
 
-        // Inicializar exactamente los 25 objetos
-        for (let i = 0; i < MAX_OBJECTS; i++) {
-            spirits.push(new Spirit(canvas.width, canvas.height));
+        const MOVEMENT_TYPES = ['up', 'down', 'diagonal', 'circular'];
+
+        class Spirit {
+        constructor() {
+            this.reset();
         }
 
-        // Estrellas de fondo procedurales
-        const stars = Array.from({ length: 50 }, () => ({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height * 0.6,
-            size: Math.random() * 2 + 0.5,
-            alpha: Math.random()
-        }));
+        reset() {
+            this.radius = Math.random() * 14 + 16;
+            this.x = Math.random() * (canvas.width - this.radius * 4) + this.radius * 2;
+            this.y = Math.random() * (canvas.height - this.radius * 4) + this.radius * 2;
+            
+            this.type = SPRITE_TYPES[Math.floor(Math.random() * SPRITE_TYPES.length)];
+            this.movement = MOVEMENT_TYPES[Math.floor(Math.random() * MOVEMENT_TYPES.length)];
+            
+            const speedFactor = Math.random() * 2 + 1;
+            this.vx = (Math.random() - 0.5) * speedFactor * 2;
+            this.vy = (Math.random() - 0.5) * speedFactor * 2;
 
-        // Niebla procedural
-        let fogOffset = 0;
-
-        function createExplosion(x, y, color, count = 12) {
-            for (let i = 0; i < count; i++) {
-                particles.push(new Particle(x, y, color));
-            }
+            this.angle = Math.random() * Math.PI * 2;
+            this.angularSpeed = (Math.random() * 0.03 + 0.015) * (Math.random() < 0.5 ? 1 : -1);
+            this.orbitRadius = Math.random() * 35 + 15;
+            this.centerX = this.x;
+            this.centerY = this.y;
+            this.trail = [];
         }
 
-        // Manejo de Colisiones entre Objetos
-        function handleCollisions() {
-            for (let i = 0; i < spirits.length; i++) {
-                for (let j = i + 1; j < spirits.length; j++) {
-                    const s1 = spirits[i];
-                    const s2 = spirits[j];
+        update() {
+            this.trail.push({ x: this.x, y: this.y });
+            if (this.trail.length > 5) this.trail.shift();
 
-                    const dx = s2.x - s1.x;
-                    const dy = s2.y - s1.y;
-                    const dist = Math.hypot(dx, dy);
+            switch(this.movement) {
+            case 'up':
+                this.y -= Math.abs(this.vy) + 0.8;
+                if (this.y < -this.radius * 2) this.y = canvas.height + this.radius;
+                break;
 
-                    if (dist < s1.radius + s2.radius) {
-                        // Animación breve de choque
-                        const midX = (s1.x + s2.x) / 2;
-                        const midY = (s1.y + s2.y) / 2;
-                        createExplosion(midX, midY, '#00f0ff', 6);
-                        audioApp.playCollisionSound();
+            case 'down':
+                this.y += Math.abs(this.vy) + 0.8;
+                if (this.y > canvas.height + this.radius * 2) this.y = -this.radius;
+                break;
 
-                        // Rebote físico simple
-                        s1.vx *= -1;
-                        s1.vy *= -1;
-                        s2.vx *= -1;
-                        s2.vy *= -1;
-
-                        // Separación inmediata para evitar que se solapen
-                        s1.x += s1.vx * 2;
-                        s1.y += s1.vy * 2;
-                    }
+            case 'diagonal':
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x - this.radius <= 0 || this.x + this.radius >= canvas.width) {
+                this.vx *= -1;
+                createSparks(this.x, this.y, '#00f5d4', 4);
                 }
+                if (this.y - this.radius <= 0 || this.y + this.radius >= canvas.height) {
+                this.vy *= -1;
+                createSparks(this.x, this.y, '#00f5d4', 4);
+                }
+                break;
+
+            case 'circular':
+                this.angle += this.angularSpeed;
+                this.centerX += this.vx * 0.4;
+                this.centerY += this.vy * 0.4;
+                if (this.centerX < 40 || this.centerX > canvas.width - 40) this.vx *= -1;
+                if (this.centerY < 40 || this.centerY > canvas.height - 40) this.vy *= -1;
+                this.x = this.centerX + Math.cos(this.angle) * this.orbitRadius;
+                this.y = this.centerY + Math.sin(this.angle) * this.orbitRadius;
+                break;
             }
         }
 
-        // Dibujar Escenario de Fondo Animado
-        function drawSceneBackground() {
-            // Cielo Nocturno Gradiente
-            const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            skyGrad.addColorStop(0, '#04000a');
-            skyGrad.addColorStop(0.6, '#140226');
-            skyGrad.addColorStop(1, '#28003d');
-            ctx.fillStyle = skyGrad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Estrellas Titilantes
-            stars.forEach(star => {
-                star.alpha += (Math.random() - 0.5) * 0.05;
-                star.alpha = Math.max(0.2, Math.min(1, star.alpha));
-                ctx.save();
-                ctx.globalAlpha = star.alpha;
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            });
-
-            // Luna Llena Mística
-            ctx.save();
+        draw() {
+            for (let i = 0; i < this.trail.length; i++) {
+            const pt = this.trail[i];
             ctx.beginPath();
-            ctx.arc(790, 85, 50, 0, Math.PI * 2);
-            ctx.fillStyle = '#fffbe8';
-            ctx.shadowColor = '#a822ff';
-            ctx.shadowBlur = 30;
+            ctx.arc(pt.x, pt.y, this.radius * 0.6, 0, Math.PI * 2);
+            ctx.fillStyle = this.type.color;
+            ctx.globalAlpha = (i / this.trail.length) * 0.25;
             ctx.fill();
-            ctx.restore();
-
-            // Siluetas de Cementerio en el Fondo
-            ctx.fillStyle = '#06010e';
-            for (let x = 0; x < canvas.width; x += 65) {
-                const h = 30 + Math.sin(x) * 12;
-                ctx.fillRect(x, canvas.height - h, 35, h);
-                ctx.beginPath();
-                ctx.arc(x + 17.5, canvas.height - h, 17.5, Math.PI, 0);
-                ctx.fill();
             }
+            ctx.globalAlpha = 1.0;
 
-            // Niebla Procedural en Movimiento
-            fogOffset += 0.5;
             ctx.save();
-            ctx.globalAlpha = 0.15;
-            ctx.fillStyle = '#a822ff';
-            for (let i = 0; i < 3; i++) {
-                ctx.beginPath();
-                ctx.arc((fogOffset + i * 300) % (canvas.width + 200) - 100, canvas.height - 40, 120, 0, Math.PI * 2);
-                ctx.fill();
-            }
+            ctx.translate(this.x, this.y);
+            ctx.shadowColor = this.type.color;
+            ctx.shadowBlur = 12;
+            ctx.font = `${this.radius * 1.7}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.type.emoji, 0, 0);
             ctx.restore();
         }
+        }
 
-        // Evento de Interacción Clic con el Mouse
-        canvas.addEventListener('click', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
+        function createSparks(x, y, color, count = 10) {
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 4 + 1.5;
+            particles.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            radius: Math.random() * 2.5 + 1,
+            color,
+            alpha: 1,
+            life: 0.05
+            });
+        }
+        }
 
-            const clickX = (e.clientX - rect.left) * scaleX;
-            const clickY = (e.clientY - rect.top) * scaleY;
+        function addFloatingText(text, x, y, color = '#ff9e00') {
+        floatingTexts.push({ text, x, y, color, alpha: 1, vy: -1.8 });
+        }
 
-            totalClicks++;
-            let hit = false;
+        function handleCollisions() {
+        for (let i = 0; i < spirits.length; i++) {
+            for (let j = i + 1; j < spirits.length; j++) {
+            const a = spirits[i];
+            const b = spirits[j];
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const dist = Math.hypot(dx, dy);
+            const minDist = a.radius + b.radius;
 
-            const now = Date.now();
-            if (now - lastHitTime < 1200) {
-                combo = Math.min(combo + 1, 8);
-            } else {
-                combo = 1;
+            if (dist < minDist) {
+                const angle = Math.atan2(dy, dx);
+                const targetX = a.x + Math.cos(angle) * minDist;
+                const targetY = a.y + Math.sin(angle) * minDist;
+                const ax = (targetX - b.x) * 0.05;
+                const ay = (targetY - b.y) * 0.05;
+                a.vx -= ax; a.vy -= ay;
+                b.vx += ax; b.vy += ay;
+                createSparks((a.x + b.x) / 2, (a.y + b.y) / 2, '#ff9e00', 3);
             }
-
-            for (let i = 0; i < spirits.length; i++) {
-                const s = spirits[i];
-                const dist = Math.hypot(clickX - s.x, clickY - s.y);
-
-                if (dist < s.radius + 12) {
-                    hit = true;
-                    successfulHits++;
-                    lastHitTime = now;
-
-                    const points = 100 * combo;
-                    score += points;
-
-                    // Efectos visuales y de audio
-                    createExplosion(s.x, s.y, '#ff6600', 16);
-                    audioApp.playCaptureSound(combo);
-
-                    const comboText = combo > 1 ? ` +${points} (x${combo} COMBO!)` : ` +${points}`;
-                    floatTexts.push(new FloatingText(s.x - 20, s.y, comboText, combo > 2 ? '#39ff14' : '#ff6600'));
-
-                    // Evento Espectral
-                    if (score > 1000 && score < 2000) {
-                        eventElem.textContent = "🌕 HORA ESPECTRAL";
-                        eventElem.className = "fw-bold text-warning animate-pulse";
-                    }
-
-                    // Reaparece aleatoriamente para garantizar SIEMPRE 25 objetos
-                    s.reset();
-                    break;
-                }
             }
+        }
+        }
 
-            if (!hit) {
-                combo = 1;
-            }
+        function initRain() {
+        for (let i = 0; i < 35; i++) {
+            rainDrops.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            len: Math.random() * 10 + 6,
+            speed: Math.random() * 3 + 5
+            });
+        }
+        }
 
-            // Actualizar HUD
-            scoreElem.textContent = score;
-            comboElem.textContent = `x${combo}`;
-            const acc = totalClicks > 0 ? Math.round((successfulHits / totalClicks) * 100) : 100;
-            accuracyElem.textContent = `${acc}%`;
+        function drawBackground() {
+        ctx.fillStyle = '#030107';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Luna
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(780, 90, 45, 0, Math.PI * 2);
+        ctx.fillStyle = '#fffae6';
+        ctx.shadowColor = '#ffd166';
+        ctx.shadowBlur = 30;
+        ctx.fill();
+        ctx.restore();
+
+        // Lluvia Espectral
+        ctx.strokeStyle = 'rgba(157, 78, 221, 0.15)';
+        rainDrops.forEach(drop => {
+            ctx.beginPath();
+            ctx.moveTo(drop.x, drop.y);
+            ctx.lineTo(drop.x - 1.5, drop.y + drop.len);
+            ctx.stroke();
+            drop.y += drop.speed;
+            if (drop.y > canvas.height) { drop.y = -10; drop.x = Math.random() * canvas.width; }
         });
 
-        // Loop de Renderizado Principal
-        function gameLoop() {
-            // Render de fondo
-            drawSceneBackground();
-
-            // Colisiones y física entre espíritus
-            handleCollisions();
-
-            // Actualizar y dibujar espíritus
-            spirits.forEach(s => {
-                s.update();
-                s.draw(ctx);
-            });
-
-            // Actualizar y dibujar partículas
-            for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.update();
-                p.draw(ctx);
-                if (p.alpha <= 0) particles.splice(i, 1);
-            }
-
-            // Actualizar y dibujar textos flotantes
-            for (let i = floatTexts.length - 1; i >= 0; i--) {
-                const ft = floatTexts[i];
-                ft.update();
-                ft.draw(ctx);
-                if (ft.alpha <= 0) floatTexts.splice(i, 1);
-            }
-
-            requestAnimationFrame(gameLoop);
+        if (Math.random() < 0.002) {
+            lightningOpacity = 0.35;
+            audio.playThunderSound();
+        }
+        if (lightningOpacity > 0) {
+            ctx.fillStyle = `rgba(224, 170, 255, ${lightningOpacity})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            lightningOpacity -= 0.02;
+        }
         }
 
-        // Iniciar videojuego al cargar
-        window.onload = () => {
-            gameLoop();
-        };
+        function drawSpotlight() {
+        const gradient = ctx.createRadialGradient(mousePos.x, mousePos.y, 15, mousePos.x, mousePos.y, 180);
+        gradient.addColorStop(0, 'rgba(0,0,0,0)');
+        gradient.addColorStop(1, 'rgba(3, 1, 7, 0.6)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // --- BUCLE PRINCIPAL DE RENDERIZADO ---
+        function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBackground();
+
+        if (gameState === 'PLAYING') {
+            spirits.forEach(s => { s.update(); s.draw(); });
+            handleCollisions();
+        } else {
+            // En pausa o menú, se dibujan estáticos o en segundo plano
+            spirits.forEach(s => { s.draw(); });
+        }
+
+        // Partículas y textos flotantes
+        particles.forEach((p, idx) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.alpha;
+            ctx.fill();
+            p.x += p.vx; p.y += p.vy; p.alpha -= p.life;
+            if (p.alpha <= 0) particles.splice(idx, 1);
+        });
+        ctx.globalAlpha = 1.0;
+
+        floatingTexts.forEach((ft, idx) => {
+            ctx.font = 'bold 16px Orbitron';
+            ctx.fillStyle = ft.color;
+            ctx.globalAlpha = ft.alpha;
+            ctx.fillText(ft.text, ft.x, ft.y);
+            ft.y += ft.vy; ft.alpha -= 0.025;
+            if (ft.alpha <= 0) floatingTexts.splice(idx, 1);
+        });
+        ctx.globalAlpha = 1.0;
+
+        drawSpotlight();
+
+        // Banner de Pausa
+        if (gameState === 'PAUSED') {
+            ctx.fillStyle = 'rgba(5, 2, 10, 0.75)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ff9e00';
+            ctx.font = 'bold 42px Creepster';
+            ctx.textAlign = 'center';
+            ctx.fillText('JUEGO EN PAUSA', canvas.width / 2, canvas.height / 2);
+        }
+
+        requestAnimationFrame(gameLoop);
+        }
+
+        // --- INTERACCIÓN Y EVENTOS ---
+        canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mousePos.x = e.clientX - rect.left;
+        mousePos.y = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('click', (e) => {
+        if (gameState !== 'PLAYING') return;
+        audio.init();
+        totalClicks++;
+
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        let hitFound = false;
+
+        for (let i = spirits.length - 1; i >= 0; i--) {
+            const s = spirits[i];
+            if (Math.hypot(clickX - s.x, clickY - s.y) <= s.radius * 1.5) {
+            hitFound = true;
+            hits++;
+            
+            const now = Date.now();
+            combo = (now - lastHitTime < 1200) ? combo + 1 : 1;
+            lastHitTime = now;
+
+            const points = 100 * combo;
+            score += points;
+
+            createSparks(s.x, s.y, s.type.color, 22);
+            addFloatingText(`+${points} ${combo > 1 ? 'x' + combo : ''}`, s.x, s.y, s.type.color);
+            audio.playPurifySound(1 + combo * 0.12);
+
+            s.reset();
+            break;
+            }
+        }
+
+        if (!hitFound) combo = 0;
+        updateHUD();
+        });
+
+        function updateHUD() {
+        document.getElementById('scoreText').innerText = score;
+        document.getElementById('comboText').innerText = `x${Math.max(1, combo)}`;
+        const acc = totalClicks > 0 ? Math.round((hits / totalClicks) * 100) : 100;
+        document.getElementById('accuracyText').innerText = `${acc}%`;
+        }
+
+        function resetGame() {
+        score = 0;
+        totalClicks = 0;
+        hits = 0;
+        combo = 0;
+        spirits = [];
+        for (let i = 0; i < MAX_OBJECTS; i++) {
+            spirits.push(new Spirit());
+        }
+        updateHUD();
+        }
+
+        // --- CONTROLES DE BOTONES ---
+        document.getElementById('btnStartGame').addEventListener('click', () => {
+        audio.init();
+        audio.isMuted = false;
+        document.getElementById('audioIcon').innerText = '🔊';
+        document.getElementById('audioText').innerText = 'Audio Activado';
+
+        resetGame();
+        gameState = 'PLAYING';
+        
+        // Ocultar Menú de Bienvenida con transición
+        const overlay = document.getElementById('welcomeOverlay');
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.style.display = 'none', 400);
+
+        // Habilitar controles de juego
+        document.getElementById('btnPause').removeAttribute('disabled');
+        document.getElementById('btnRestart').removeAttribute('disabled');
+        });
+
+        document.getElementById('btnPause').addEventListener('click', () => {
+        if (gameState === 'PLAYING') {
+            gameState = 'PAUSED';
+            document.getElementById('btnPause').style.display = 'none';
+            document.getElementById('btnResume').style.display = 'inline-block';
+            document.getElementById('btnResume').removeAttribute('disabled');
+        }
+        });
+
+        document.getElementById('btnResume').addEventListener('click', () => {
+        if (gameState === 'PAUSED') {
+            gameState = 'PLAYING';
+            document.getElementById('btnResume').style.display = 'none';
+            document.getElementById('btnPause').style.display = 'inline-block';
+        }
+        });
+
+        document.getElementById('btnRestart').addEventListener('click', () => {
+        resetGame();
+        gameState = 'PLAYING';
+        document.getElementById('btnResume').style.display = 'none';
+        document.getElementById('btnPause').style.display = 'inline-block';
+        });
+
+        document.getElementById('btnAudio').addEventListener('click', () => {
+        audio.init();
+        audio.isMuted = !audio.isMuted;
+        document.getElementById('audioIcon').innerText = audio.isMuted ? '🔇' : '🔊';
+        document.getElementById('audioText').innerText = audio.isMuted ? 'Audio Místico' : 'Audio Activado';
+        });
+
+        // Inicializar Motor
+        function init() {
+        for (let i = 0; i < MAX_OBJECTS; i++) {
+            spirits.push(new Spirit());
+        }
+        initRain();
+        gameLoop();
+        }
+
+        window.onload = init;
     </script>
-</body>
-</html>
+    </body>
+    </html>
