@@ -4,796 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caza de Espíritus 2D - Motor Canvas Pro | Graficación</title>
-    
-    <!-- Favicon SVG Temático -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
-    
-    <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
+
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Orbitron:wght@400;700;900&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-        --bg-dark: #0a0512;
-        --accent-purple: #9d4edd;
-        --accent-orange: #ff9e00;
-        --accent-cyan: #00f5d4;
-        --panel-bg: rgba(18, 10, 31, 0.90);
-        }
-
-        body {
-        background: radial-gradient(circle at center, #1b0c33 0%, #05020a 100%);
-        color: #e2e8f0;
-        font-family: 'Quicksand', sans-serif;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        overflow-x: hidden;
-        user-select: none;
-        }
-
-        .font-spooky {
-        font-family: 'Creepster', cursive;
-        letter-spacing: 2px;
-        }
-
-        .font-hud {
-        font-family: 'Orbitron', sans-serif;
-        }
-
-        /* Puntero Personalizado de Alta Visibilidad */
-        .custom-cursor-area {
-        cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><circle cx='20' cy='20' r='18' fill='none' stroke='%2300f5d4' stroke-width='2' stroke-dasharray='4 2'/><circle cx='20' cy='20' r='4' fill='%23ff9e00'/><line x1='20' y1='2' x2='20' y2='38' stroke='%2300f5d4' stroke-width='1.5'/><line x1='2' y1='20' x2='38' y2='20' stroke='%2300f5d4' stroke-width='1.5'/></svg>") 20 20, crosshair;
-        }
-
-        /* Estilizado del Lienzo Canvas */
-        #gameCanvas {
-        background: #030107;
-        border: 3px solid var(--accent-purple);
-        border-radius: 16px;
-        box-shadow: 0 0 35px rgba(157, 78, 221, 0.35), inset 0 0 20px rgba(0, 0, 0, 0.8);
-        width: 100%;
-        height: 520px;
-        display: block;
-        }
-
-        .glass-card {
-        background: var(--panel-bg);
-        backdrop-filter: blur(14px);
-        border: 1px solid rgba(157, 78, 221, 0.3);
-        border-radius: 16px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-        }
-
-        .stat-badge {
-        background: rgba(0, 0, 0, 0.6);
-        border: 1px solid rgba(255, 158, 0, 0.3);
-        border-radius: 10px;
-        padding: 6px 14px;
-        }
-
-        /* Menú de Bienvenida Overlay */
-        #welcomeOverlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(5, 2, 10, 0.92);
-        backdrop-filter: blur(8px);
-        z-index: 100;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        border-radius: 16px;
-        transition: opacity 0.4s ease;
-        }
-
-        .btn-action {
-        font-weight: 700;
-        font-family: 'Orbitron', sans-serif;
-        transition: all 0.25s ease;
-        }
-
-        .btn-action:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 15px currentColor;
-        }
-
-        footer {
-        margin-top: auto;
-        border-top: 1px solid rgba(157, 78, 221, 0.2);
-        background: rgba(5, 2, 10, 0.95);
-        }
-    </style>
+    <link href="css/estilos.css" rel="stylesheet">
     </head>
     <body class="custom-cursor-area">
 
-    <!-- HEADER -->
     <header class="py-3 mb-2 border-bottom border-purple">
-        <div class="container d-flex flex-wrap justify-content-between align-items-center">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-3">
-            <span class="fs-1">🎃</span>
-            <div>
+        <img src="assets/calabaza.svg" alt="Calabaza, logo del videojuego" class="header-icon">
+        <div>
             <h1 class="h2 mb-0 font-spooky text-warning">Caza de Espíritus 2D</h1>
-            <small class="text-muted font-hud">Graficación &bull; TecNM Pachuca</small>
-            </div>
-        </div>
-        <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
-            <button id="btnAudio" class="btn btn-outline-info btn-sm rounded-pill px-3 font-hud">
-            <span id="audioIcon">🔇</span> <span id="audioText">Audio Místico</span>
-            </button>
+            <small class="text-muted font-hud">Graficación &bull; Canvas API</small>
         </div>
         </div>
+        <button id="btnAudio" class="btn btn-outline-info btn-sm rounded-pill px-3 font-hud mt-2 mt-md-0">
+        <span id="audioIcon">🔇</span> <span id="audioText">Audio Místico</span>
+        </button>
+    </div>
     </header>
 
-    <!-- MAIN CONTENT -->
     <main class="container my-2 flex-grow-1">
-        <div class="row g-3">
-        
-        <!-- Lado Izquierdo: CANVAS + CONTROLES + HUD -->
+    <div class="row g-3">
+
         <div class="col-lg-9">
-            <div class="glass-card p-3 mb-3 position-relative overflow-hidden">
-            
-            <!-- MENÚ DE BIENVENIDA MODAL (OVERLAY) -->
+        <div class="glass-card p-3 mb-3 position-relative overflow-hidden">
+
             <div id="welcomeOverlay" class="text-center p-4">
-                <div class="mb-3">
-                <span class="display-1">💀🦇🕯️</span>
-                </div>
-                <h2 class="font-spooky text-warning display-5 mb-2">Caza de Espíritus 2D</h2>
-                <p class="text-light mb-4 max-w-lg mx-auto" style="max-width: 500px;">
-                Bienvenido al simulador interactivo de gráficos 2D. Purifica las 25 entidades místicas en movimiento, evita perder el combo y domina los rebotes vectoriales en el cementerio nocturno.
-                </p>
-                <button id="btnStartGame" class="btn btn-warning btn-lg px-5 py-3 rounded-pill btn-action fs-5 text-dark">
+            <div class="mb-3"><span class="display-1">💀🦇🕯️</span></div>
+            <h2 class="font-spooky text-warning display-5 mb-2">Caza de Espíritus 2D</h2>
+            <p class="text-light mb-4 mx-auto" style="max-width: 500px;">
+                Purifica las 25 entidades del cementerio antes de que el combo se enfríe.
+                Haz clic sobre ellas: rebotan entre sí, aparecen y desaparecen solas, y cada
+                una suena distinto al capturarla.
+            </p>
+            <button id="btnStartGame" class="btn btn-warning btn-lg px-5 py-3 rounded-pill btn-action fs-5 text-dark">
                 🚀 Iniciar Cacería
-                </button>
-                <div class="mt-4 text-muted font-hud small">
-                Desarrollado por: Eduardo Zenil Guerrero
-                </div>
+            </button>
+            <div class="mt-4 text-muted font-hud small">Desarrollado por: Eduardo Zenil Guerrero</div>
             </div>
 
-            <!-- BARRA DE CONTROLES SUPERIOR DEL JUEGO -->
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                <div class="d-flex gap-2">
+            <div class="d-flex gap-2">
                 <button id="btnPause" class="btn btn-warning btn-sm btn-action text-dark" disabled>⏸️ Pausar</button>
                 <button id="btnResume" class="btn btn-success btn-sm btn-action" style="display:none;" disabled>▶️ Reanudar</button>
                 <button id="btnRestart" class="btn btn-outline-danger btn-sm btn-action" disabled>🔄 Reiniciar</button>
-                </div>
-                
-                <div class="d-flex gap-3">
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
                 <div class="stat-badge text-center">
-                    <span class="text-uppercase text-muted small d-block font-hud" style="font-size: 0.65rem;">Atrapados</span>
-                    <span id="scoreText" class="fs-5 fw-bold text-warning font-hud">0</span>
-                </div>
-                <div class="stat-badge text-center">
-                    <span class="text-uppercase text-muted small d-block font-hud" style="font-size: 0.65rem;">Combo</span>
-                    <span id="comboText" class="fs-5 fw-bold text-info font-hud">x1</span>
+                <span class="etiqueta-stat">Capturados</span>
+                <span id="capturedText" class="fs-5 fw-bold text-warning font-hud">0</span>
                 </div>
                 <div class="stat-badge text-center">
-                    <span class="text-uppercase text-muted small d-block font-hud" style="font-size: 0.65rem;">Precisión</span>
-                    <span id="accuracyText" class="fs-5 fw-bold text-success font-hud">100%</span>
+                <span class="etiqueta-stat">Puntos</span>
+                <span id="scoreText" class="fs-5 fw-bold text-light font-hud">0</span>
                 </div>
+                <div class="stat-badge text-center">
+                <span class="etiqueta-stat">Combo</span>
+                <span id="comboText" class="fs-5 fw-bold text-info font-hud">x1</span>
+                </div>
+                <div class="stat-badge text-center">
+                <span class="etiqueta-stat">Precisión</span>
+                <span id="accuracyText" class="fs-5 fw-bold text-success font-hud">100%</span>
+                </div>
+                <div class="stat-badge text-center">
+                <span class="etiqueta-stat">Récord</span>
+                <span id="bestText" class="fs-5 fw-bold text-warning font-hud">0</span>
                 </div>
             </div>
+            </div>
 
-            <!-- LIENZO CANVAS PRINCIPAL -->
             <div class="position-relative">
-                <canvas id="gameCanvas" width="900" height="520"></canvas>
-            </div>
-
+            <canvas id="gameCanvas" width="900" height="520" aria-label="Escenario del videojuego"></canvas>
             </div>
         </div>
+        </div>
 
-        <!-- Lado Derecho: Instrucciones y Panel Técnico -->
         <div class="col-lg-3">
-            <div class="glass-card p-3 h-100 d-flex flex-column justify-content-between">
+        <div class="glass-card p-3 h-100 d-flex flex-column justify-content-between">
             <div>
-                <h5 class="font-spooky text-warning mb-3 fs-4">📖 Reglas de Negocio</h5>
-                <ul class="list-unstyled small text-light space-y-2">
-                <li class="mb-2">✨ <strong>25 Objetos Activos:</strong> Desplazamiento aleatorio en 4 direcciones (arriba, abajo, diagonal con rebote, circular).</li>
-                <li class="mb-2">🎯 <strong>Interacción Mouse:</strong> Haz clic para purificar entidades; reaparecen al instante manteniendo siempre 25 en canvas.</li>
-                <li class="mb-2">💥 <strong>Física de Colisiones:</strong> Rebotes elásticos entre objetos con animaciones de chispas.</li>
-                <li class="mb-2">🎵 <strong>Audio & Clima:</strong> Música ambiental espeluznante, efectos únicos por objeto y relámpagos.</li>
-                </ul>
+            <h5 class="font-spooky text-warning mb-3 fs-4">📖 Cómo jugar</h5>
+            <ul class="list-unstyled small text-light">
+                <li class="mb-2">✨ Siempre hay <strong>25 entidades</strong> moviéndose arriba, abajo, en diagonal o en círculo.</li>
+                <li class="mb-2">🎯 <strong>Clic</strong> para purificarlas: reaparecen al instante en otra parte.</li>
+                <li class="mb-2">💥 Al chocar entre sí <strong>rebotan</strong> con una animación de impacto.</li>
+                <li class="mb-2">🔥 Captura seguido para subir tu <strong>combo</strong> de puntos.</li>
+            </ul>
             </div>
-
             <div class="p-2 border border-secondary rounded bg-dark bg-opacity-50 text-center mt-3">
-                <small class="text-info d-block fw-bold font-hud">GRAFICACIÓN</small>
-                <small class="text-muted" style="font-size: 0.7rem;">2DO SEGUIMIENTO</small>
+            <small class="text-info d-block fw-bold font-hud">GRAFICACIÓN</small>
+            <small class="text-muted" style="font-size:.7rem;">VIDEOJUEGO 2D CON CANVAS</small>
             </div>
-            </div>
+        </div>
         </div>
 
-        </div>
+    </div>
     </main>
 
-    <!-- FOOTER -->
     <footer class="py-3 text-center text-muted small">
-        <div class="container">
+    <div class="container">
         <p class="mb-1 text-light">Desarrollado por <strong class="text-warning">Eduardo Zenil Guerrero</strong></p>
-        <p class="mb-0 text-secondary" style="font-size: 0.8rem;">Asignatura: <span class="text-info">Graficación</span> &bull; Num. Control: <strong class="text-light">25200365</strong></p>
-        </div>
+        <p class="mb-0 text-secondary" style="font-size:.8rem;">Asignatura: <span class="text-info">Graficación</span> &bull; Núm. Control: <strong class="text-light">25200365</strong> &bull; Repositorio: zenilguerrero1234-del</p>
+    </div>
     </footer>
 
-    <!-- SCRIPT DEL MOTOR DE JUEGO FULL STACK -->
-    <script>
-        /**
-         * MOTOR DE JUEGO CANVAS 2D - EDICIÓN PROFESIONAL FULL STACK
-         * Autor: Eduardo Zenil Guerrero
-         * Asignatura: Graficación
-         */
-
-        let gameState = 'MENU';
-
-        // SINTETIZADOR DE AUDIO MÍSTICO AVANZADO (Web Audio API)
-        class AudioEngine {
-        constructor() {
-            this.ctx = null;
-            this.isMuted = true;
-            this.ambientNodes = [];
-            this.ambientInterval = null;
-        }
-
-        init() {
-            if (!this.ctx) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.ctx = new AudioContext();
-            }
-            if (this.ctx.state === 'suspended') {
-            this.ctx.resume();
-            }
-        }
-
-        // Canción de fondo espeluznante (Drone ambiental con acordes menores + campanadas)
-        startSpookyMusic() {
-            if (!this.ctx || this.ambientNodes.length > 0) return;
-
-            const osc1 = this.ctx.createOscillator();
-            const osc2 = this.ctx.createOscillator();
-            const filter = this.ctx.createBiquadFilter();
-            const gain = this.ctx.createGain();
-
-            // Acorde menor misterioso (A2 y D#4 tritone)
-            osc1.type = 'sawtooth';
-            osc1.frequency.setValueAtTime(110, this.ctx.currentTime); 
-            osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(155.56, this.ctx.currentTime); 
-
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(350, this.ctx.currentTime);
-
-            gain.gain.setValueAtTime(0.04, this.ctx.currentTime); // Volumen sutil de fondo
-
-            osc1.connect(filter);
-            osc2.connect(filter);
-            filter.connect(gain);
-            gain.connect(this.ctx.destination);
-
-            osc1.start();
-            osc2.start();
-            this.ambientNodes = [osc1, osc2, gain];
-
-            // Campanadas espectrales periódicas en escala menor
-            this.ambientInterval = setInterval(() => {
-            if (this.isMuted || !this.ctx || gameState !== 'PLAYING') return;
-            const chime = this.ctx.createOscillator();
-            const chimeGain = this.ctx.createGain();
-            chime.type = 'sine';
-            const notes = [440, 523.25, 659.25, 698.46, 880];
-            const freq = notes[Math.floor(Math.random() * notes.length)];
-            chime.frequency.setValueAtTime(freq, this.ctx.currentTime);
-            chimeGain.gain.setValueAtTime(0.06, this.ctx.currentTime);
-            chimeGain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1.5);
-            chime.connect(chimeGain);
-            chimeGain.connect(this.ctx.destination);
-            chime.start();
-            chime.stop(this.ctx.currentTime + 1.5);
-            }, 4000);
-        }
-
-        stopSpookyMusic() {
-            this.ambientNodes.forEach(node => {
-            try { node.stop ? node.stop() : node.disconnect(); } catch(e){}
-            });
-            this.ambientNodes = [];
-            if (this.ambientInterval) {
-            clearInterval(this.ambientInterval);
-            this.ambientInterval = null;
-            }
-        }
-
-        // Sonido único y diferente dependiendo del objeto (tipo) clickeado
-        playObjectSound(typeName, combo = 1) {
-            if (this.isMuted || !this.ctx) return;
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            const now = this.ctx.currentTime;
-
-            switch(typeName) {
-            case 'skull': // 💀 Campana profunda de tumba
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(220 * combo, now);
-                osc.frequency.exponentialRampToValueAtTime(110, now + 0.3);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-                break;
-            
-            case 'pumpkin': // 🎃 Golpe hueco de calabaza / madera
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150 * combo, now);
-                osc.frequency.linearRampToValueAtTime(75, now + 0.18);
-                gain.gain.setValueAtTime(0.35, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-                break;
-
-            case 'ghost': // 👻 Susurro etéreo ascendente
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33 * combo, now);
-                osc.frequency.exponentialRampToValueAtTime(1174.66, now + 0.28);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
-                break;
-
-            case 'bat': // 🦇 Chirrido agudo y rápido
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(880 * combo, now);
-                osc.frequency.linearRampToValueAtTime(1400, now + 0.12);
-                gain.gain.setValueAtTime(0.15, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-                break;
-
-            case 'candle': // 🕯️ Destello cálido / campanita cristalina
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(783.99 * combo, now);
-                osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.22);
-                gain.gain.setValueAtTime(0.25, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-                break;
-
-            default:
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(440 * combo, now);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-            }
-
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start(now);
-            osc.stop(now + 0.35);
-        }
-
-        playThunderSound() {
-            if (this.isMuted || !this.ctx) return;
-            const bufferSize = this.ctx.sampleRate * 0.4;
-            const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-            }
-
-            const noise = this.ctx.createBufferSource();
-            noise.buffer = buffer;
-
-            const filter = this.ctx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(250, this.ctx.currentTime);
-
-            const gain = this.ctx.createGain();
-            gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
-
-            noise.connect(filter);
-            filter.connect(gain);
-            gain.connect(this.ctx.destination);
-
-            noise.start();
-        }
-        }
-
-        const audio = new AudioEngine();
-
-        // CANVAS SETUP
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-
-        const MAX_OBJECTS = 25;
-        let spirits = [];
-        let particles = [];
-        let floatingTexts = [];
-        let rainDrops = [];
-
-        // MÉTRICAS
-        let score = 0;
-        let totalClicks = 0;
-        let hits = 0;
-        let combo = 0;
-        let lastHitTime = 0;
-        let mousePos = { x: -1000, y: -1000 };
-        let lightningOpacity = 0;
-
-        const SPRITE_TYPES = [
-        { name: 'skull', emoji: '💀', color: '#e0aaff' },
-        { name: 'pumpkin', emoji: '🎃', color: '#ff9e00' },
-        { name: 'ghost', emoji: '👻', color: '#00f5d4' },
-        { name: 'bat', emoji: '🦇', color: '#7b2cbf' },
-        { name: 'candle', emoji: '🕯️', color: '#ffd166' }
-        ];
-
-        const MOVEMENT_TYPES = ['up', 'down', 'diagonal', 'circular'];
-
-        class Spirit {
-        constructor() {
-            this.reset();
-        }
-
-        reset() {
-            this.radius = Math.random() * 14 + 16;
-            this.x = Math.random() * (canvas.width - this.radius * 4) + this.radius * 2;
-            this.y = Math.random() * (canvas.height - this.radius * 4) + this.radius * 2;
-            
-            this.type = SPRITE_TYPES[Math.floor(Math.random() * SPRITE_TYPES.length)];
-            this.movement = MOVEMENT_TYPES[Math.floor(Math.random() * MOVEMENT_TYPES.length)];
-            
-            const speedFactor = Math.random() * 2 + 1;
-            this.vx = (Math.random() - 0.5) * speedFactor * 2;
-            this.vy = (Math.random() - 0.5) * speedFactor * 2;
-
-            this.angle = Math.random() * Math.PI * 2;
-            this.angularSpeed = (Math.random() * 0.03 + 0.015) * (Math.random() < 0.5 ? 1 : -1);
-            this.orbitRadius = Math.random() * 35 + 15;
-            this.centerX = this.x;
-            this.centerY = this.y;
-            this.trail = [];
-        }
-
-        update() {
-            this.trail.push({ x: this.x, y: this.y });
-            if (this.trail.length > 5) this.trail.shift();
-
-            switch(this.movement) {
-            case 'up':
-                this.y -= Math.abs(this.vy) + 0.8;
-                if (this.y < -this.radius * 2) this.y = canvas.height + this.radius;
-                break;
-
-            case 'down':
-                this.y += Math.abs(this.vy) + 0.8;
-                if (this.y > canvas.height + this.radius * 2) this.y = -this.radius;
-                break;
-
-            case 'diagonal':
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x - this.radius <= 0 || this.x + this.radius >= canvas.width) {
-                this.vx *= -1;
-                createSparks(this.x, this.y, '#00f5d4', 4);
-                }
-                if (this.y - this.radius <= 0 || this.y + this.radius >= canvas.height) {
-                this.vy *= -1;
-                createSparks(this.x, this.y, '#00f5d4', 4);
-                }
-                break;
-
-            case 'circular':
-                this.angle += this.angularSpeed;
-                this.centerX += this.vx * 0.4;
-                this.centerY += this.vy * 0.4;
-                if (this.centerX < 40 || this.centerX > canvas.width - 40) this.vx *= -1;
-                if (this.centerY < 40 || this.centerY > canvas.height - 40) this.vy *= -1;
-                this.x = this.centerX + Math.cos(this.angle) * this.orbitRadius;
-                this.y = this.centerY + Math.sin(this.angle) * this.orbitRadius;
-                break;
-            }
-        }
-
-        draw() {
-            for (let i = 0; i < this.trail.length; i++) {
-            const pt = this.trail[i];
-            ctx.beginPath();
-            ctx.arc(pt.x, pt.y, this.radius * 0.6, 0, Math.PI * 2);
-            ctx.fillStyle = this.type.color;
-            ctx.globalAlpha = (i / this.trail.length) * 0.25;
-            ctx.fill();
-            }
-            ctx.globalAlpha = 1.0;
-
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.shadowColor = this.type.color;
-            ctx.shadowBlur = 12;
-            ctx.font = `${this.radius * 1.7}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(this.type.emoji, 0, 0);
-            ctx.restore();
-        }
-        }
-
-        function createSparks(x, y, color, count = 10) {
-        for (let i = 0; i < count; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 4 + 1.5;
-            particles.push({
-            x, y,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            radius: Math.random() * 2.5 + 1,
-            color,
-            alpha: 1,
-            life: 0.05
-            });
-        }
-        }
-
-        function addFloatingText(text, x, y, color = '#ff9e00') {
-        floatingTexts.push({ text, x, y, color, alpha: 1, vy: -1.8 });
-        }
-
-        function handleCollisions() {
-        for (let i = 0; i < spirits.length; i++) {
-            for (let j = i + 1; j < spirits.length; j++) {
-            const a = spirits[i];
-            const b = spirits[j];
-            const dx = b.x - a.x;
-            const dy = b.y - a.y;
-            const dist = Math.hypot(dx, dy);
-            const minDist = a.radius + b.radius;
-
-            if (dist < minDist) {
-                const angle = Math.atan2(dy, dx);
-                const targetX = a.x + Math.cos(angle) * minDist;
-                const targetY = a.y + Math.sin(angle) * minDist;
-                const ax = (targetX - b.x) * 0.05;
-                const ay = (targetY - b.y) * 0.05;
-                a.vx -= ax; a.vy -= ay;
-                b.vx += ax; b.vy += ay;
-                createSparks((a.x + b.x) / 2, (a.y + b.y) / 2, '#ff9e00', 3);
-            }
-            }
-        }
-        }
-
-        function initRain() {
-        for (let i = 0; i < 35; i++) {
-            rainDrops.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            len: Math.random() * 10 + 6,
-            speed: Math.random() * 3 + 5
-            });
-        }
-        }
-
-        function drawBackground() {
-        ctx.fillStyle = '#030107';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Luna
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(780, 90, 45, 0, Math.PI * 2);
-        ctx.fillStyle = '#fffae6';
-        ctx.shadowColor = '#ffd166';
-        ctx.shadowBlur = 30;
-        ctx.fill();
-        ctx.restore();
-
-        // Lluvia Espectral
-        ctx.strokeStyle = 'rgba(157, 78, 221, 0.15)';
-        rainDrops.forEach(drop => {
-            ctx.beginPath();
-            ctx.moveTo(drop.x, drop.y);
-            ctx.lineTo(drop.x - 1.5, drop.y + drop.len);
-            ctx.stroke();
-            drop.y += drop.speed;
-            if (drop.y > canvas.height) { drop.y = -10; drop.x = Math.random() * canvas.width; }
-        });
-
-        if (Math.random() < 0.002) {
-            lightningOpacity = 0.35;
-            audio.playThunderSound();
-        }
-        if (lightningOpacity > 0) {
-            ctx.fillStyle = `rgba(224, 170, 255, ${lightningOpacity})`;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            lightningOpacity -= 0.02;
-        }
-        }
-
-        function drawSpotlight() {
-        const gradient = ctx.createRadialGradient(mousePos.x, mousePos.y, 15, mousePos.x, mousePos.y, 180);
-        gradient.addColorStop(0, 'rgba(0,0,0,0)');
-        gradient.addColorStop(1, 'rgba(3, 1, 7, 0.6)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        // --- BUCLE PRINCIPAL DE RENDERIZADO ---
-        function gameLoop() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawBackground();
-
-        if (gameState === 'PLAYING') {
-            spirits.forEach(s => { s.update(); s.draw(); });
-            handleCollisions();
-        } else {
-            spirits.forEach(s => { s.draw(); });
-        }
-
-        particles.forEach((p, idx) => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = p.alpha;
-            ctx.fill();
-            p.x += p.vx; p.y += p.vy; p.alpha -= p.life;
-            if (p.alpha <= 0) particles.splice(idx, 1);
-        });
-        ctx.globalAlpha = 1.0;
-
-        floatingTexts.forEach((ft, idx) => {
-            ctx.font = 'bold 16px Orbitron';
-            ctx.fillStyle = ft.color;
-            ctx.globalAlpha = ft.alpha;
-            ctx.fillText(ft.text, ft.x, ft.y);
-            ft.y += ft.vy; ft.alpha -= 0.025;
-            if (ft.alpha <= 0) floatingTexts.splice(idx, 1);
-        });
-        ctx.globalAlpha = 1.0;
-
-        drawSpotlight();
-
-        if (gameState === 'PAUSED') {
-            ctx.fillStyle = 'rgba(5, 2, 10, 0.75)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#ff9e00';
-            ctx.font = 'bold 42px Creepster';
-            ctx.textAlign = 'center';
-            ctx.fillText('JUEGO EN PAUSA', canvas.width / 2, canvas.height / 2);
-        }
-
-        requestAnimationFrame(gameLoop);
-        }
-
-        // --- INTERACCIÓN Y EVENTOS ---
-        canvas.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        mousePos.x = e.clientX - rect.left;
-        mousePos.y = e.clientY - rect.top;
-        });
-
-        canvas.addEventListener('click', (e) => {
-        if (gameState !== 'PLAYING') return;
-        audio.init();
-        totalClicks++;
-
-        const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-        let hitFound = false;
-
-        for (let i = spirits.length - 1; i >= 0; i--) {
-            const s = spirits[i];
-            if (Math.hypot(clickX - s.x, clickY - s.y) <= s.radius * 1.5) {
-            hitFound = true;
-            hits++;
-            
-            const now = Date.now();
-            combo = (now - lastHitTime < 1200) ? combo + 1 : 1;
-            lastHitTime = now;
-
-            const points = 100 * combo;
-            score += points;
-
-            createSparks(s.x, s.y, s.type.color, 22);
-            addFloatingText(`+${points} ${combo > 1 ? 'x' + combo : ''}`, s.x, s.y, s.type.color);
-            
-            // Reproducir sonido único según el objeto (💀, 🎃, 👻, 🦇, 🕯️)
-            audio.playObjectSound(s.type.name, combo);
-
-            s.reset();
-            break;
-            }
-        }
-
-        if (!hitFound) combo = 0;
-        updateHUD();
-        });
-
-        function updateHUD() {
-        document.getElementById('scoreText').innerText = score;
-        document.getElementById('comboText').innerText = `x${Math.max(1, combo)}`;
-        const acc = totalClicks > 0 ? Math.round((hits / totalClicks) * 100) : 100;
-        document.getElementById('accuracyText').innerText = `${acc}%`;
-        }
-
-        function resetGame() {
-        score = 0;
-        totalClicks = 0;
-        hits = 0;
-        combo = 0;
-        spirits = [];
-        for (let i = 0; i < MAX_OBJECTS; i++) {
-            spirits.push(new Spirit());
-        }
-        updateHUD();
-        }
-
-        // --- CONTROLES DE BOTONES ---
-        document.getElementById('btnStartGame').addEventListener('click', () => {
-        audio.init();
-        audio.isMuted = false;
-        document.getElementById('audioIcon').innerText = '🔊';
-        document.getElementById('audioText').innerText = 'Audio Activado';
-
-        resetGame();
-        gameState = 'PLAYING';
-        audio.startSpookyMusic(); // Iniciar canción de fondo espeluznante
-
-        const overlay = document.getElementById('welcomeOverlay');
-        overlay.style.opacity = '0';
-        setTimeout(() => overlay.style.display = 'none', 400);
-
-        document.getElementById('btnPause').removeAttribute('disabled');
-        document.getElementById('btnRestart').removeAttribute('disabled');
-        });
-
-        document.getElementById('btnPause').addEventListener('click', () => {
-        if (gameState === 'PLAYING') {
-            gameState = 'PAUSED';
-            audio.stopSpookyMusic();
-            document.getElementById('btnPause').style.display = 'none';
-            document.getElementById('btnResume').style.display = 'inline-block';
-            document.getElementById('btnResume').removeAttribute('disabled');
-        }
-        });
-
-        document.getElementById('btnResume').addEventListener('click', () => {
-        if (gameState === 'PAUSED') {
-            gameState = 'PLAYING';
-            if (!audio.isMuted) audio.startSpookyMusic();
-            document.getElementById('btnResume').style.display = 'none';
-            document.getElementById('btnPause').style.display = 'inline-block';
-        }
-        });
-
-        document.getElementById('btnRestart').addEventListener('click', () => {
-        resetGame();
-        gameState = 'PLAYING';
-        if (!audio.isMuted) {
-            audio.stopSpookyMusic();
-            audio.startSpookyMusic();
-        }
-        document.getElementById('btnResume').style.display = 'none';
-        document.getElementById('btnPause').style.display = 'inline-block';
-        });
-
-        document.getElementById('btnAudio').addEventListener('click', () => {
-        audio.init();
-        audio.isMuted = !audio.isMuted;
-        document.getElementById('audioIcon').innerText = audio.isMuted ? '🔇' : '🔊';
-        document.getElementById('audioText').innerText = audio.isMuted ? 'Audio Místico' : 'Audio Activado';
-        
-        if (audio.isMuted) {
-            audio.stopSpookyMusic();
-        } else if (gameState === 'PLAYING') {
-            audio.startSpookyMusic();
-        }
-        });
-
-        // Inicializar Motor
-        function init() {
-        for (let i = 0; i < MAX_OBJECTS; i++) {
-            spirits.push(new Spirit());
-        }
-        initRain();
-        gameLoop();
-        }
-
-        window.onload = init;
-    </script>
+    <audio id="musicaFondo" src="assets/musica.wav" loop preload="auto"></audio>
+    <script src="js/juego.js"></script>
     </body>
     </html>
