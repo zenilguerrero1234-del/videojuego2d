@@ -13,7 +13,7 @@
 
 ---
 
-## 📌 1. Descripción del proyecto
+##  1. Descripción del proyecto
 
 El proyecto consiste en desarrollar un videojuego llamado **Caza de Espíritus 2D**, como parte de las actividades de la materia de Graficación. El juego está inspirado en la temática de Halloween y el Día de Muertos, por lo que cuenta con un escenario nocturno y diferentes personajes, como fantasmas, calaveras, calabazas, murciélagos y velas.
 
@@ -23,7 +23,7 @@ Durante el juego, los personajes se desplazan por el escenario y es necesario ha
 
 ---
 
-## 🎯 2. Objetivo
+##  2. Objetivo
 
 El objetivo es crear un videojuego en 2D que permita poner en práctica los conocimientos adquiridos en la materia de Graficación mediante el uso de figuras, movimientos, animaciones e interacción con el usuario.
 
@@ -38,7 +38,7 @@ Entre las principales características del juego se encuentran las siguientes:
 
 ---
 
-## ⚖️ 3. Justificación
+##  3. Justificación
 
 La creación de este videojuego permite poner en práctica diferentes temas de la materia de Graficación y conocer cómo se pueden utilizar para desarrollar una aplicación interactiva.
 
@@ -50,7 +50,7 @@ Por otra parte, se utiliza Bootstrap para organizar los elementos de la interfaz
 
 ---
 
-## 🎮 4. Cómo jugar
+##  4. Cómo jugar
 
 ### Pantalla de bienvenida
 
@@ -74,7 +74,7 @@ El escenario también incluye efectos visuales y un cursor con apariencia de mir
 
 ---
 
-## 💡 5. Conclusión
+##  5. Conclusión
 
 El desarrollo de este proyecto permite poner en práctica los conocimientos adquiridos en la materia de Graficación y comprender mejor cómo se crean los movimientos y las animaciones en un videojuego. Durante su elaboración se trabaja con Canvas y JavaScript para dibujar los personajes, controlar sus movimientos y detectar las interacciones con el mouse.
 
